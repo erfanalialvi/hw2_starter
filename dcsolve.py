@@ -1,10 +1,7 @@
-""" Find the lowest cost way to transform a three or four letter word
-into another by changing one letter at a time so that all of the
-intervening strings are legal English words.  The cost of a
-replacement letter can be 1 (steps), based on scrabble values
-(scrabble), or based on the resulting words frequency in normal text
-(frequency)
-"""
+""" Find the lowest cost way to transform a three or four letter word into another by changing one
+letter at a time so that all of the `qintervening strings are legal English words.  The cost of a
+replacement letter can be 1 (steps), based on scrabble values (scrabble), or based on the resulting
+words frequency in normal text (frequency) """
 
 import argparse
 import time
@@ -23,13 +20,21 @@ def dcsolver(initial="dog", goal="cat", cost='steps'):
     start = time.time()
     solution = astar_search(problem)
     elapsed = time.time() - start
-    if solution:
-        path = ' '.join([node.state for node in solution.path()])
-        path_cost = int(round(solution.path_cost))
+    if  solution:
+        solution_path = path = ' '.join([node.state for node in solution.path()])
+        solution_cost = solution.path_cost
+        # show how much h() underestimated H-star. Should all be <= 0
+        deltas = [rnd(node.path_cost + problem.h(node) - solution_cost) for node in solution.path()][:-1]
     else:
-        path = "NO SOLUTION"
-        path_cost = -1
-    print(f"{problem} cost:{path_cost}; time:{elapsed: .3f}; solution:{path}")
+        solution_path = "NO SOLUTION"
+        deltas = []
+        solution_cost = -1
+    print(f"{problem} cost:{solution_cost:.2f}; time:{elapsed:.3f}; solution:{solution_path}; deltas:{deltas}")
+
+def rnd(n):
+    # round to 3 decimal places, replace -0.0 with 0.0
+    n = round(n,3)
+    return 0.0 if n == -0.0 else n     # -0.0 ==> 0.0
 
 # if called from the command line, call dcsolver
 if __name__ == "__main__":
